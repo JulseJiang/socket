@@ -5,7 +5,6 @@
  */
 package mySocketUI;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -14,7 +13,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -24,19 +22,18 @@ public class SeverSocketTest_ForUIfile {
 	private ArrayList<String> clientlist = new ArrayList<>();
 	private ArrayList<String> namelist = new ArrayList<>();
 	private ArrayList<PrintWriter> pwlist = new ArrayList<>();
-	private ArrayList<BufferedReader> brlist = new ArrayList<>();
+	private ArrayList<InputStreamReader> iReaderlist = new ArrayList<>();
 	private LinkedList<String> msglist = new LinkedList<>();
-	private String ip;
-	private int port;
 	public SeverSocketTest_ForUIfile() {
 		try {
-			ss = new ServerSocket(20000);
-			
+			ss = new ServerSocket(20001);
+			System.out.println("SeverSocketTest_ForUIfile:文件传输通道已打开");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		new ClientThread().start();
 		new SendMsgToAllClient().start();
+	
 	}
 //	接收客户端套接字线程
 	class ClientThread extends Thread {
@@ -45,22 +42,23 @@ public class SeverSocketTest_ForUIfile {
 			namelist.add("namelist===");
 			clientlist.add("iplist===");
 			while(this.isAlive()){
-				BufferedReader buf = null;
+				
 				try {
 					Socket s=ss.accept();
+					System.out.println("小明你好，现在下载文件");
 					clientlist.add(s.getInetAddress().toString());
 					namelist.add("小明");
 					System.out.println(s.getInetAddress());
 
-					buf = new BufferedReader(new InputStreamReader(s.getInputStream()));
-					brlist.add(buf);
-					new GetMsgFromClient(buf).start();
+//					buf = new BufferedReader(new InputStreamReader(s.getInputStream()));
+//					brlist.add(buf);
+//					new GetMsgFromClient(buf).start();
+					InputStreamReader iReader = new InputStreamReader(s.getInputStream());
+					iReaderlist.add(iReader);
+					new GetMsgFromClient(iReader).start();
 					PrintWriter pw = new PrintWriter(s.getOutputStream());
 					pwlist.add(pw);
-					pw.println("连接成功  " + "在线人数：" + (clientlist.size()-1));
-					pw.println("欢迎来到聊天室");
-					pw.println(namelist);
-					pw.flush();
+					
 				} catch (SocketException e) {
 					System.out.println("socket已关闭");
 					e.printStackTrace();
@@ -118,35 +116,21 @@ public class SeverSocketTest_ForUIfile {
 		}
 	}
 
-	// 从各个客户端获取消息
+	// 从各个客户端读取文件
 	class GetMsgFromClient extends Thread {
-		BufferedReader buf;
+		InputStreamReader iReader= null;
 
-		public GetMsgFromClient(BufferedReader buf) {
-			this.buf = buf;
+		public GetMsgFromClient(InputStreamReader iReader) {
+			this.iReader=iReader;
 		}
 
 		@Override
 		public void run() {
-			int key=brlist.indexOf(buf);
+			int key=iReaderlist.indexOf(iReader);
 			try {
 				while (this.isAlive()) {
-					String str=buf.readLine();
-					if (str.equals("quit")){
-						 
-						 System.out.println("key:"+key);
-						 clientlist.remove(key+1);
-						 pwlist.remove(key);
-						 brlist.remove(key);
-						 namelist.remove(key+1);
-					}
-					else if (str!= null){
-						SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-						String time = format.format(new Date());
-						msglist.addFirst("<==" + time + "==>   " + str);
-						namelist.set(key+1, str.substring(0, str.indexOf(":")));
-						
-					}
+					
+					
 					
 
 				}
@@ -167,16 +151,20 @@ public class SeverSocketTest_ForUIfile {
 		@Override
 		public void run() {
 			while (this.isAlive()) {
-				if (!msglist.isEmpty()) {
+				if (iReaderlist.size()>0) {
 					// String msg=msglist.remove();
-					String msg = msglist.removeLast();
-					for (int i = 0; i < pwlist.size(); i++) {
-						pwlist.get(i).println(msg);
-						pwlist.get(i).println(clientlist);
-						pwlist.get(i).println(namelist);
-						pwlist.get(i).flush();
+//					String msg = msglist.removeLast();
+					for(int j = 0;j<iReaderlist.size();j++){
+						for (int i = 0; i < pwlist.size(); i++) {
+							pwlist.get(i).println(iReaderlist.get(j));
+//							pwlist.get(i).println(clientlist);
+//							pwlist.get(i).println(namelist);
+							pwlist.get(i).flush();
 
+						}
 					}
+					
+					
 				}
 			}
 		}
@@ -192,9 +180,6 @@ public class SeverSocketTest_ForUIfile {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		new SocketUI().setVisible(true);
-		new SocketUI().setVisible(true);
-		new SocketUI().setVisible(true);
 		new SeverSocketTest_ForUIfile();
 	}
 

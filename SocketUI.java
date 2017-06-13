@@ -21,7 +21,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import javax.imageio.stream.FileImageOutputStream;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -67,6 +66,8 @@ public class SocketUI extends JFrame{
 	private Socket client;
 	private PrintWriter pw;
 	private boolean isMass=true;
+	private Socket socket_file;
+	private ClientSocketTest_ForUIfile cf;
 	private ArrayList<String> ipList=new ArrayList<>();
 	private ArrayList<String> namelist=new ArrayList<>();
 	public SocketUI() {
@@ -141,8 +142,12 @@ public class SocketUI extends JFrame{
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				ToConn();
-				
+				client=ToConn(text_ip.getText().trim(),Integer.parseInt(text_port.getText().trim()));
+				System.out.println("btn_conn：初始化client:"+(client==null));
+				new ClientSocketTest_ForUI(SocketUI.this);
+				socket_file=ToConn(text_ip.getText().trim(),Integer.parseInt(text_port.getText().trim())+1);
+				System.out.println("btn_conn：初始化：socket_file"+(socket_file==null));
+				cf= new ClientSocketTest_ForUIfile(SocketUI.this);
 			}
 		});
 		btn_off.addActionListener(new ActionListener() {
@@ -150,20 +155,19 @@ public class SocketUI extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				DisConn();
-				
-				
-				
+			
 			}
 		});
 		btn_send.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("点击发送按钮");
 				if ("".equals(text_name.getText().trim()) || "".equals(text_buffer.getText().trim())) {
 					SocketUI.this.setStr_content("昵称或发送内容不能为空");
 				} 
 				else if (client != null && !client.isClosed()) {
-					
+					System.out.println("btn_send 消息已成功发送到服务器端");
 					String str =text_name.getText().trim()+":"+ text_buffer.getText().trim();
 					//						pw.println(text_name.getText().trim());
 					//						pw.println(text_buffer.getText().trim());
@@ -171,6 +175,10 @@ public class SocketUI extends JFrame{
 											pw.flush();
 					//						text_buffer.setText("");
 					//						setStr_content(str);
+				}else {
+					System.out.println("btn_send  发送失败  ");
+					System.out.println("检查client：(client!=null)---"+(client!=null));
+					System.out.println("检查client: client.isClosed()---"+client.isClosed());
 				}
 
 			}
@@ -183,7 +191,11 @@ public class SocketUI extends JFrame{
 				chooser.setFileFilter(new FileNameExtensionFilter("JPEG file", "jpg","png","gif","jpeg"));
 				if (chooser.showOpenDialog(SocketUI.this)==JFileChooser.APPROVE_OPTION) {
 					File file=chooser.getSelectedFile();
-					setIcon_content(file.getAbsolutePath());
+//					setIcon_content(file.getAbsolutePath());
+					
+//					cf.UpLoadFile(file);
+					pw.print("file==="+text_name.getText().toString()+"发送了图片");
+					pw.flush();
 				}
 				
 			}
@@ -249,16 +261,18 @@ public class SocketUI extends JFrame{
 			}
 //		}
 	}
-	public void ToConn(){
+	public Socket ToConn(String ip,int portnumber){
+		Socket s=null;
 		try {
-			client=new Socket(text_ip.getText().trim(),Integer.parseInt(text_port.getText().trim()));
-			if (client.isConnected()) {
+			s=new Socket(ip,portnumber);
+			
+			System.out.println("ToConn is null:"+(s==null));
+			
+			if (s.isConnected()) {
 				sdoc=jta_content.getStyledDocument();
 				ConnState(true);
-				pw = new PrintWriter(client.getOutputStream());
+				pw = new PrintWriter(s.getOutputStream());
 				
-				
-				new ClientSocketTest_ForUI(SocketUI.this);
 			}
 			else {
 //				str_content.append("连接失败");
@@ -271,6 +285,7 @@ public class SocketUI extends JFrame{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return s;
 	}
 	
 	public void setIpList(ArrayList<String> ipList) {
@@ -296,10 +311,19 @@ public class SocketUI extends JFrame{
 //	public String getMes(){
 //		return text_buffer.getText().trim();
 //	}
+	public ClientSocketTest_ForUIfile getCf() {
+		return cf;
+	}
 	public Socket getClient() {
+		if (client==null) {
+			System.out.println("client is null");
+			
+		}
 		return client;
 	}
-	
+	public Socket getSocket_file() {
+		return socket_file;
+	}
 	public String getIp() {
 		return l_ip.getText().trim();
 	}

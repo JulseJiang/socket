@@ -16,21 +16,23 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
+
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 public class SeverSocketTest_ForUI {
-	ServerSocket ss;
+	ServerSocket ss,sflie;
 	private ArrayList<String> clientlist = new ArrayList<>();
 	private ArrayList<String> namelist = new ArrayList<>();
 	private ArrayList<PrintWriter> pwlist = new ArrayList<>();
 	private ArrayList<BufferedReader> brlist = new ArrayList<>();
 	private LinkedList<String> msglist = new LinkedList<>();
-	private String ip;
-	private int port;
 	public SeverSocketTest_ForUI() {
 		try {
 			ss = new ServerSocket(20000);
+			System.out.println("SeverSocketTest_ForUI 聊天服务器开启");
+//			sflie=new ServerSocket(20001);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -47,6 +49,7 @@ public class SeverSocketTest_ForUI {
 				BufferedReader buf = null;
 				try {
 					Socket s=ss.accept();
+					System.out.println("SeverSocketTest_ForUI ClientThread 检测到新加入的客户端");
 					clientlist.add(s.getInetAddress().toString());
 					namelist.add("小明");
 					System.out.println(s.getInetAddress());
@@ -123,6 +126,7 @@ public class SeverSocketTest_ForUI {
 
 		public GetMsgFromClient(BufferedReader buf) {
 			this.buf = buf;
+			System.out.println("SeverSocketTest_ForUI GetMsgFromClient 服务器启动线程读取客户端的消息");
 		}
 
 		@Override
@@ -130,6 +134,7 @@ public class SeverSocketTest_ForUI {
 			int key=brlist.indexOf(buf);
 			try {
 				while (this.isAlive()) {
+					System.out.println("SeverSocketTest_ForUI GetMsgFromClient run 在循环中读取客户端的消息");
 					String str=buf.readLine();
 					if (str.equals("quit")){
 						 
@@ -145,8 +150,11 @@ public class SeverSocketTest_ForUI {
 						msglist.addFirst("<==" + time + "==>   " + str);
 						namelist.set(key+1, str.substring(0, str.indexOf(":")));
 						
+						System.out.println("SeverSocketTest_ForUI GetMsgFromClient run 将消息存储到消息链表中");
 					}
-					
+					else {
+						System.out.println("未从客户端读取到字符串");
+					}
 
 				}
 			} catch (Exception e) {
@@ -174,7 +182,7 @@ public class SeverSocketTest_ForUI {
 						pwlist.get(i).println(clientlist);
 						pwlist.get(i).println(namelist);
 						pwlist.get(i).flush();
-
+						System.out.println("SeverSocketTest_ForUI SendMsgToAllClient 服务器群发消息给客户端，第 "+i+" 个客户端");
 					}
 				}
 			}
@@ -191,10 +199,11 @@ public class SeverSocketTest_ForUI {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		new SocketUI().setVisible(true);
-		new SocketUI().setVisible(true);
+//		new SocketUI().setVisible(true);
+//		new SocketUI().setVisible(true);
 		new SocketUI().setVisible(true);
 		new SeverSocketTest_ForUI();
+		new SeverSocketTest_ForUIfile();
 	}
 
 }
