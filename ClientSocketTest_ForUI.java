@@ -17,13 +17,9 @@ public class ClientSocketTest_ForUI {
 	private SocketUI socketUI;
 	private Socket client;
 
-	// private String ip;
-	// private String port;
 	public ClientSocketTest_ForUI(SocketUI socketUI) {
 		System.out.println("ClientSocketTest_ForUI 客户端消息处理器已启动");
 		this.socketUI = socketUI;
-		// ip=socketUI.getIp();
-		// port=socketUI.getPort();
 		client = socketUI.getClient();
 		new SeverThread(client).start();
 	}

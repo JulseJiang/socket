@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ClientSocketTest_ForUIfile {
@@ -31,7 +32,7 @@ public class ClientSocketTest_ForUIfile {
 		@Override
 		public void run() {
 			super.run();
-			while(this.isAlive()){
+			if(this.isAlive()){
 				System.out.println("ClientSocketTest_ForUIfile 下载文件");
 				DownLoadFile(s);
 			}
@@ -41,15 +42,11 @@ public class ClientSocketTest_ForUIfile {
 	public void UpLoadFile(File file) {
 		try {
 			FileInputStream fis = new FileInputStream(file);
-			OutputStream out=client.getOutputStream();
-			byte[] buffer = new byte[1024];
-			int len = 0;
-			while((len=fis.read(buffer))!=0){
-				out.write(buffer, 0, len);
-			}
-			out.write(buffer);
-			out.close();
+			PrintWriter pw = new PrintWriter(client.getOutputStream());
+			pw.println(fis);
+			pw.flush();
 			fis.close();
+			pw.close();
 			System.out.println("上传完毕");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -60,7 +57,7 @@ public class ClientSocketTest_ForUIfile {
 //	下载文件
 	public void DownLoadFile(Socket s){
 		System.out.println("文件正在被下载：DownLoadFile");
-		File file = new File("temp");
+		File file = new File("E:\\temp.png");
 		try {
 			FileOutputStream fos = new FileOutputStream(file);
 			InputStream in = s.getInputStream();

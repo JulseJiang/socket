@@ -53,7 +53,6 @@ public class SeverSocketTest_ForUI {
 					clientlist.add(s.getInetAddress().toString());
 					namelist.add("小明");
 					System.out.println(s.getInetAddress());
-
 					buf = new BufferedReader(new InputStreamReader(s.getInputStream()));
 					brlist.add(buf);
 					new GetMsgFromClient(buf).start();
@@ -136,6 +135,7 @@ public class SeverSocketTest_ForUI {
 				while (this.isAlive()) {
 					System.out.println("SeverSocketTest_ForUI GetMsgFromClient run 在循环中读取客户端的消息");
 					String str=buf.readLine();
+					System.out.println("服务器读到的字符串str为："+str);
 					if (str.equals("quit")){
 						 
 						 System.out.println("key:"+key);
@@ -200,10 +200,10 @@ public class SeverSocketTest_ForUI {
 			e.printStackTrace();
 		}
 //		new SocketUI().setVisible(true);
-//		new SocketUI().setVisible(true);
+		new SocketUI().setVisible(true);
 		new SocketUI().setVisible(true);
 		new SeverSocketTest_ForUI();
-		new SeverSocketTest_ForUIfile();
+//		new SeverSocketTest_ForUIfile();
 	}
 
 }

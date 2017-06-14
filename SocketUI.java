@@ -169,13 +169,10 @@ public class SocketUI extends JFrame{
 				else if (client != null && !client.isClosed()) {
 					System.out.println("btn_send 消息已成功发送到服务器端");
 					String str =text_name.getText().trim()+":"+ text_buffer.getText().trim();
-					//						pw.println(text_name.getText().trim());
-					//						pw.println(text_buffer.getText().trim());
 											pw.println(str);
 											pw.flush();
-					//						text_buffer.setText("");
-					//						setStr_content(str);
-				}else {
+				}
+				else {
 					System.out.println("btn_send  发送失败  ");
 					System.out.println("检查client：(client!=null)---"+(client!=null));
 					System.out.println("检查client: client.isClosed()---"+client.isClosed());
@@ -192,8 +189,9 @@ public class SocketUI extends JFrame{
 				if (chooser.showOpenDialog(SocketUI.this)==JFileChooser.APPROVE_OPTION) {
 					File file=chooser.getSelectedFile();
 //					setIcon_content(file.getAbsolutePath());
-					
-//					cf.UpLoadFile(file);
+					System.out.println("客户端正在发送图片...file==null"+(file==null));
+					cf.UpLoadFile(file);
+					System.out.println("客户端发送图片成功");
 					pw.print("file==="+text_name.getText().toString()+"发送了图片");
 					pw.flush();
 				}
