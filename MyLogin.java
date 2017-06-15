@@ -16,6 +16,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 public class MyLogin extends JFrame {
 	
 	private JPanel j_name;
@@ -93,7 +95,7 @@ public class MyLogin extends JFrame {
 				System.out.println("password="+u_pwd);
 				if (db.find(u_name, u_pwd)) {
 					JOptionPane.showMessageDialog(null, "登录成功","提示",JOptionPane.INFORMATION_MESSAGE);
-					MyLogin.this.setVisible(false);
+					showMainFrame();
 				}else {
 					JOptionPane.showMessageDialog(null, "登录失败，请重试","提示",JOptionPane.INFORMATION_MESSAGE);
 				}
@@ -114,6 +116,7 @@ public class MyLogin extends JFrame {
 				}
 				else if (db.insertUser(u_name, u_pwd)) {
 					JOptionPane.showMessageDialog(null, "注册成功","提示",JOptionPane.INFORMATION_MESSAGE);
+					showMainFrame();
 				}
 			}
 		});
@@ -140,6 +143,18 @@ public class MyLogin extends JFrame {
 	}
 	public int getU_id() {
 		return u_id;
+	}
+	public void  showMainFrame(){
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());// 适应系统的显示风格
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		MyLogin.this.dispose();
+		new SocketUI().setVisible(true);
+		new SeverSocketTest_ForUI();
 	}
 	
 	public static void main(String[] args) {
