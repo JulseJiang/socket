@@ -70,8 +70,10 @@ public class ClientSocketTest_ForUI {
 					socketUI.refreshClientList(cList);
 				} else {
 					if (Pattern.compile("file===").matcher(str).find()) {
-						String ke = str.substring(str.indexOf("file==="), str.length() - 1);
-						socketUI.setStr_content(ke);
+						String ke = str.substring(str.indexOf("file==="), str.length());
+						System.out.println("index of "+str.indexOf(" file==="));
+						System.out.println("ke= "+ke);
+//						socketUI.setStr_content(ke);
 					}
 					else {
 						socketUI.setStr_content(str);

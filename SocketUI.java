@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -81,6 +83,15 @@ public class SocketUI extends JFrame{
 		this.getContentPane().add(p_aside, BorderLayout.EAST);
 		this.getContentPane().add(p_south, BorderLayout.SOUTH);
 		this.getContentPane().add(p_center, BorderLayout.CENTER);
+		//窗口关闭的时候关闭连接
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				super.windowClosed(arg0);
+				DisConn();
+			}
+		});
 	}
 	public SocketUI(String title){
 		this();
@@ -188,11 +199,11 @@ public class SocketUI extends JFrame{
 				chooser.setFileFilter(new FileNameExtensionFilter("JPEG file", "jpg","png","gif","jpeg"));
 				if (chooser.showOpenDialog(SocketUI.this)==JFileChooser.APPROVE_OPTION) {
 					File file=chooser.getSelectedFile();
-//					setIcon_content(file.getAbsolutePath());
-					System.out.println("客户端正在发送图片...file==null"+(file==null));
-					cf.UpLoadFile(file);
-					System.out.println("客户端发送图片成功");
-					pw.print("file==="+text_name.getText().toString()+"发送了图片");
+					setIcon_content(file.getAbsolutePath());
+//					System.out.println("客户端正在发送图片...file==null"+(file==null));
+//					cf.UpLoadFile(file);
+//					System.out.println("客户端发送图片成功");
+					pw.println("file==="+text_name.getText().toString()+"发送了图片");
 					pw.flush();
 				}
 				
@@ -245,7 +256,7 @@ public class SocketUI extends JFrame{
 	public void DisConn(){
 //		int result =JOptionPane.showConfirmDialog(SocketUI.this, "退出聊天室");
 		
-//		if (result==0) {
+		if (client!=null) {
 			try {
 				pw.println("quit");
 				pw.flush();
@@ -257,7 +268,7 @@ public class SocketUI extends JFrame{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-//		}
+		}
 	}
 	public Socket ToConn(String ip,int portnumber){
 		Socket s=null;
@@ -300,9 +311,17 @@ public class SocketUI extends JFrame{
 		}
 	}
 	public void setIcon_content(String url){
-		Icon icon=new ImageIcon(url);
-		jta_content.insertIcon(icon);
 		
+		Icon icon=new ImageIcon(url);
+		//将光标移到当前位置
+		jta_content.setCaretPosition(jta_content.getStyledDocument().getLength());
+		jta_content.insertIcon(icon);
+		try {
+			sdoc.insertString(sdoc.getLength(), icon+"\n", null);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 	}
